@@ -1,8 +1,11 @@
-# Uncomment the next line to define a global platform for your project
-platform :ios, '15.5'
+# Specify the iOS platform version
+platform :ios, '15.5.0'  # or newer version
+
+# Specify the workspace
+workspace 'Runner.xcworkspace'
 
 target 'Runner' do
-  # Comment the next line if you don't want to use dynamic frameworks
+  # Enables dynamic frameworks for Flutter plugins
   use_frameworks!
 
   # Pods for Runner
@@ -11,5 +14,24 @@ target 'Runner' do
     inherit! :search_paths
     # Pods for testing
   end
+end
 
+# Specify the iOS deployment version
+$iOSVersion = '15.5.0'
+
+post_install do |installer|
+  # Update the build configurations for all projects
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings["EXCLUDED_ARCHS[sdk=*]"] = "armv7"
+    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+  end
+
+  installer.pods_project.targets.each do |target|
+    # Ensure deployment target is correct
+    target.build_configurations.each do |config|
+      if Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+      end
+    end
+  end
 end
