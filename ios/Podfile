@@ -1,14 +1,16 @@
-# Specify the iOS platform version
-platform :ios, '15.5.0'  # or newer version
+platform :ios, '15.5.0'
+
+# Include Flutter's helper scripts
+require File.expand_path('../.flutter-plugins-dependencies', __FILE__)
 
 # Specify the workspace
 workspace 'Runner.xcworkspace'
 
 target 'Runner' do
-  # Enables dynamic frameworks for Flutter plugins
   use_frameworks!
 
-  # Pods for Runner
+  # Add all Flutter plugin pods
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
   target 'RunnerTests' do
     inherit! :search_paths
@@ -16,7 +18,6 @@ target 'Runner' do
   end
 end
 
-# Specify the iOS deployment version
 $iOSVersion = '15.5.0'
 
 post_install do |installer|
@@ -27,7 +28,6 @@ post_install do |installer|
   end
 
   installer.pods_project.targets.each do |target|
-    # Ensure deployment target is correct
     target.build_configurations.each do |config|
       if Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
